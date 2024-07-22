@@ -95,7 +95,7 @@ class ListItem extends HTMLElement {
     if (draggingElement !== this) {
       const rect = this.getBoundingClientRect();
       const next = (e.clientY - rect.top) / (rect.bottom - rect.top) > 0.5;
-      console.log(next);
+
       this.parentNode.insertBefore(
         draggingElement,
         next ? this.nextSibling : this
