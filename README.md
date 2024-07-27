@@ -1,145 +1,62 @@
-## Design-to-develop_handoff
+## 아토믹 컴포넌트 구현
 
-### html 구조
+##### Figma 컴포넌트 → React 컴포넌트 구현과제
 
-```jsx
-<ul class="list">
-  <list-item
-    src="/public/architectures/architecture-1.jpg"
-    alt="History of Architecture"
-    text="History of Architecture"
-    tabindex="0"
-    draggable="true"
-    aria-label="아이템을 위 아래 방향키로 이동 시킬 수 있습니다."
-  ></list-item>
-  <list-item
-    src="/public/architectures/architecture-2.jpg"
-    alt="Building design"
-    text="Building design"
-    tabindex="0"
-    draggable="true"
-    aria-label="아이템을 위 아래 방향키로 이동 시킬 수 있습니다."
-  ></list-item>
-  <list-item
-    src="/public/architectures/architecture-3.jpg"
-    alt="Graphics"
-    text="Graphics"
-    tabindex="0"
-    draggable="true"
-    aria-label="아이템을 위 아래 방향키로 이동 시킬 수 있습니다."
-  ></list-item>
-  <list-item
-    src="/public/architectures/architecture-4.jpg"
-    alt="Climatology"
-    text="Climatology"
-    tabindex="0"
-    draggable="true"
-    aria-label="아이템을 위 아래 방향키로 이동 시킬 수 있습니다."
-  ></list-item>
-</ul>
+- 바닐라 프로젝트 결과물에서 구현할 컴포넌트를 1개 선정 및 Figma를 사용해 선정한 컴포넌트 정의 및 변형을 설계합니다.
+- 디자인된 컴포넌트를 React 컴포넌트로 구현합니다.
 
-// list-item 템플릿
-<li class="list-item">
-  <img class="list-item__img" src="" alt="" />
-  <p class="list-item__text"></p>
-</li>
-```
+##### Figma를 사용하여 선정한 컴포넌트
 
-- 리스트와 리스트 아이템을 ul, li 태그를 사용하여 구조를 설계 하였습니다.
-- 커스텀 엘리먼트에 tabindex 속성을 주어 탭으로 포커스가 되도록 하였습니다.
-- 커스텀 엘리먼트에 draggable 속성을 주어 드래그가 가능하게 하였습니다.
-- 커스텀 엘리먼트에 aria-label 속성을 통해 아이템을 위 아래 방향키로 이동 시킬 수 있다는 것을 알 수 있도록 하였습니다.
+![alt text](/public/image.png)
 
-### index.js
+- Button 및 Input 컴포넌트 설계를 하였습니다.
 
-```js
-import "/src/components/listItem.js";
+![alt text](/public/image-1.png)
 
-> listItem 컴포넌트 모듈을 불러옵니다.
-```
+- Button에 대한 프로퍼티 정의 Layout(Fill, Stroke), size(large, small)
 
-### listItem.js
+![alt text](/public/image-2.png)
 
-```jsx
-render() {
-  // 템플릿 생략
-  this.shadowRoot.appendChild(template.content.cloneNode(true));
-  this.img = this.shadowRoot.querySelector(".list-item__img");
-  this.text = this.shadowRoot.querySelector(".list-item__text");
-  this.item = this.shadowRoot.querySelector(".list-item");
-  this.setupListeners();
-}
-```
+- Input에 대한 프로퍼티 정의 Type(Default, Focus), PlaceHolder
 
-- 템플릿 렌더링 및 선택자를 선언하고 이벤트 설정 함수 호출
+##### 프로젝트 폴더 구성
 
-```jsx
-setupListeners() {
-  this.addEventListener("dragstart", this.handleDragStart.bind(this));
-  this.addEventListener("dragover", this.handleDragOver.bind(this));
-  this.addEventListener("dragend", this.handleDragEnd.bind(this));
-  this.addEventListener("keydown", this.handleKeyDown.bind(this));
-}
-```
+![alt text](/public/image-3.png)
 
-- 이벤트 리스너 지정 및 핸들러 연결
-- 드래그 정렬을 위해 dragstart, dragover, dragend 이벤트 사용
-- 키보드로 위치 이동을 위해 keydown 이벤트 사용
+- vite 도구를 활용하여 리액트 CRA 및 TypeScript 사용
+- 아토믹 디자인을 기반으로한 컴포넌트 안 atmos, molecules 폴더 분리
+- atmos(가장 작은 단위) - Button, Input
+- molecules(Atoms의 조합) - LoginForm
 
-```jsx
-handleDragStart(e) {
-    this.classList.add("dragging");
-    e.dataTransfer.effectAllowed = "move";
-  }
+##### 버튼 컴포넌트
 
-handleDragOver(e) {
-  e.preventDefault();
-  e.dataTransfer.dropEffect = "move";
-  const draggingElement = this.parentNode.querySelector(".dragging");
-  if (draggingElement !== this) {
-    const rect = this.getBoundingClientRect();
-    const next = (e.clientY - rect.top) / (rect.bottom - rect.top) > 0.5;
-    this.parentNode.insertBefore(
-      draggingElement,
-      next ? this.nextSibling : this
-    );
-  }
-}
+![alt text](/public/image-4.png)
 
-handleDragEnd(e) {
-  this.classList.remove("dragging");
-}
-```
+- line 3 ~ 8: 버튼 Props에 대한 타입 정의
+- line 10 ~ 25: 함수형 컴포넌트 Button 생성 layout, size는 Default 값으로 'stroke', 'large'를 할당시킴. onClick은 null일 수도 있다는 타입 정의. text는 필수 값으로 타입 정의하여 버튼 컴포넌트의 재사용성을 높임
 
-- handleDragStart 리스트 아이템을 드래그 시작할때 이벤트발생시 호출되는 함수 dragging 클래스를 추가하여 드래그를 한 아이템에 outline을 스타일링
-- handleDragOver 리스트 아이템을 드래그 하면서 마우스가 대상 객체 위에 자리 잡고있을때 호출되는 함수 부모 노드에서 현재 드래그중인 요소를 찾고 드래그 중인 요소와 현재 요소가 다를 경우 현재 요소의 위치에 대한 정보를 가져온 뒤 마우스 위치에 따라 삽입 위치를 할당 해놓고 드래그 중인 요소를 next가 true일시에 이동 시키려는 영역으로 드래그 위치가 들어 왔을시에 위치로 이동 시킵니다.
-- handleDragEnd 리스트 아이템을 드래그하고 마우스 버튼을 놓는 순간 호출되는 함수 dragging 클래스를 제거하여 outline 스타일링 제거
+##### 인풋 컴포넌트
 
-```jsx
-handleKeyDown(e) {
-  const itemArray = Array.from(this.parentNode.children);
-  const currentIndex = itemArray.indexOf(this);
-  let newIndex;
+![alt text](/public/image-5.png)
 
-  if (e.code === "ArrowUp" && currentIndex > 0) {
-    newIndex = currentIndex - 1;
-  } else if (e.code === "ArrowDown" && currentIndex < itemArray.length - 1) {
-    newIndex = currentIndex + 1;
-  }
+- line 3 ~ 8: 인풋 Props에 대한 타입 정의
+- line 10 ~ 25: type, placeholder null일 수 있고, 기본값들 정의. value, onChange는 필수 값으로 정의 하여 인풋 컴포넌트의 재사용성을 높임.
 
-  if (newIndex !== undefined) {
-    if (newIndex < currentIndex) {
-      this.parentNode.insertBefore(this, itemArray[newIndex]);
-    } else {
-      this.parentNode.insertBefore(this, itemArray[newIndex].nextSibling);
-    }
+##### 로그인폼 컴포넌트
 
-    this.focus();
-  }
-}
-```
+![alt text](/public/image-6.png)
 
-- 키보드로 리스트 아이템을 이동할때 호출되는 함수, 조건문으로 위, 아래 방향키 조건 처리
-- 위 방향키를 누른 경우 현재 인덱스가 0보다 클경우 현재 인덱스에서 1을 뺀뒤 인덱스를 저장 해놓고, 현재 인덱스가 새로운 인덱스 보다 클시에 insertBefore메서드를 통해 새로운 인덱스 보다 앞에 노드 삽입.
-- 아래 방향키도 비슷한 원리
-- insertBefore 메서드는 주어진 노드가 문서에 이미 존재하는 경우, insertBefore()현재 위치에서 새 위치로 이동합니다. (즉, 지정된 새 부모에 추가하기 전에 기존 부모에서 자동으로 제거됩니다.)
+- line 6 ~ 7: 인풋 상태관리를 위한 useState 훅을 사용
+- line 10 ~ 27: 이벤트 호출에 대한 핸들러 정의
+- line 29 ~ 52: Button, Input 컴포넌트를 불러와 사용 및 설계된 디자인에 맞게 Props를 전달
+
+##### 결과
+
+![alt text](/public/image-7.png)
+
+- 각 컴포넌트들을 조합하여 App.tsx에 렌더링한 결과입니다.
+
+##### 느낀점
+
+- 컴포넌트 분리를 함으로서 코드 가독성 및 유지 보수가 쉬워짐을 느꼈고 재사용성도 높아져 불필요한 코드 반복이 이루어지지 않는다는 것이 좋다는 것을 느꼈습니다.
+- 또한, 추후 각 컴포넌트에 대한 내부 로직들도 길어진다면 분리를 해야 한다는것을 알게 되었습니다. 관심사 분리가 중요.
