@@ -19,11 +19,11 @@ const LoginForm = () => {
   const handleSubmit = (
     event: React.MouseEvent<HTMLButtonElement, MouseEvent>
   ) => {
+    event.preventDefault();
     if (email.trim() === '' || password.trim() === '') {
       alert('이메일 혹은 비밀번호를 입력해주세요');
       return;
     }
-    console.log(event.target);
     alert(`이메일: ${email} 비밀번호: ${password}`);
   };
 
@@ -32,12 +32,18 @@ const LoginForm = () => {
       <h2>로그인</h2>
       <div className='login-input-group'>
         <Input
+          id='login-email'
+          label='이메일'
+          showLabel={false}
           type='email'
           placeholder='이메일을 입력해주세요'
           value={email}
           onChange={handleEmailChange}
         />
         <Input
+          id='login-password'
+          label='비밀번호'
+          showLabel={false}
           type='password'
           placeholder='비밀번호를 입력해주세요'
           value={password}
@@ -45,8 +51,20 @@ const LoginForm = () => {
         />
       </div>
       <div className='login-button-group'>
-        <Button layout='fill' text='로그인' onClick={handleSubmit} />
-        <Button text='회원가입' />
+        <Button
+          layout='fill'
+          type='submit'
+          text='로그인'
+          onClick={handleSubmit}
+        />
+        <a
+          href='#'
+          className='button large stroke'
+          role='button'
+          aria-label='회원가입 페이지로 이동'
+        >
+          회원가입
+        </a>
       </div>
     </form>
   );

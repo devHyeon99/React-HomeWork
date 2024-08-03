@@ -1,62 +1,103 @@
-## 아토믹 컴포넌트 구현
+## 컴포넌트 속성 검사 및 테스트
 
-##### Figma 컴포넌트 → React 컴포넌트 구현과제
+### Input 컴포넌트
 
-- 바닐라 프로젝트 결과물에서 구현할 컴포넌트를 1개 선정 및 Figma를 사용해 선정한 컴포넌트 정의 및 변형을 설계합니다.
-- 디자인된 컴포넌트를 React 컴포넌트로 구현합니다.
+```jsx
+import React from 'react';
+import './Input.css';
 
-##### Figma를 사용하여 선정한 컴포넌트
+type InputProps = {
+  id: string,
+  type?: 'text' | 'email' | 'password',
+  placeholder?: string,
+  value: string,
+  onChange: (event: React.ChangeEvent<HTMLInputElement>) => void,
+  label: string,
+  showLabel?: boolean,
+};
 
-![alt text](/public/image.png)
+const Input = ({
+  id,
+  type = 'text',
+  placeholder = '',
+  value,
+  onChange,
+  label,
+  showLabel = true,
+}: InputProps) => {
+  return (
+    <div className='input-container'>
+      {label && (
+        <label htmlFor={id} className={showLabel ? 'input-label' : 'sr-only'}>
+          {label}
+        </label>
+      )}
+      <input
+        id={id}
+        className='input'
+        type={type}
+        placeholder={placeholder}
+        value={value}
+        onChange={onChange}
+      />
+    </div>
+  );
+};
 
-- Button 및 Input 컴포넌트 설계를 하였습니다.
+export default Input;
+```
 
-![alt text](/public/image-1.png)
+- props중 `type` `placeholder` `showLabel` 속성은 옵셔널로 처리하여 기본값을 설정 해두었습니다.
+- props중 `id` `value` `onChange` `label` 속성은 필수로 있어야 하는 속성으로 생각하였습니다.
+- 기존 `input`요소만 있었던점을 보완하여 `label`요소도 추가 하였고 `showLabel` 속성을 추가하여 디자인 설계에 맞출 수 있도록 하였습니다.
 
-- Button에 대한 프로퍼티 정의 Layout(Fill, Stroke), size(large, small)
+### Button 컴포넌트
 
-![alt text](/public/image-2.png)
+```jsx
+import React from 'react';
+import './Button.css';
 
-- Input에 대한 프로퍼티 정의 Type(Default, Focus), PlaceHolder
+type ButtonProps = {
+  layout?: 'stroke' | 'fill',
+  type: 'button' | 'submit',
+  size?: 'small' | 'medium' | 'large',
+  text: string,
+  onClick: (event: React.MouseEvent<HTMLButtonElement, MouseEvent>) => void,
+};
 
-##### 프로젝트 폴더 구성
+const Button = ({
+  layout = 'stroke',
+  type,
+  size = 'large',
+  text,
+  onClick,
+}: ButtonProps) => {
+  return (
+    <button
+      className={`button ${layout} ${size}`}
+      type={type}
+      onClick={onClick}
+    >
+      {text}
+    </button>
+  );
+};
 
-![alt text](/public/image-3.png)
+export default Button;
+```
 
-- vite 도구를 활용하여 리액트 CRA 및 TypeScript 사용
-- 아토믹 디자인을 기반으로한 컴포넌트 안 atmos, molecules 폴더 분리
-- atmos(가장 작은 단위) - Button, Input
-- molecules(Atoms의 조합) - LoginForm
+- props중 `layout` `size` 속성은 옵셔널로 처리하여 기본값을 설정해두도록 하였습니다.
+- props중 `type` `text` `onClick` 속성은 필수로 있어야 하는 속성으로 생각하였습니다.
 
-##### 버튼 컴포넌트
+<hr />
+❗️ 이미 저번 과제에서 타입스크립트를 활용하여 컴포넌트에 대한 속성 검사는 과제 실습을 하였어서 지난 과제에 대한 피드백에 대한 리팩토링을 진행 하였습니다.
 
-![alt text](/public/image-4.png)
+1. 주언어 설정을 한국어로 설정하였습니다.
+2. `<noscript>` 요소를 추가하여 최소한의 접근성을 준수하였습니다.
+3. 로그인은 버튼 태그로 회원가입은 링크 태그로 적절한 요소 사용을 준수하였습니다.
+4. 버튼 컴포넌트 속성에 type을 추가하여 `button` 또는 `submit` 타입을 props로 받도록 하였습니다.
+5. 인풋 컴포넌트에 유요한 레이블이 존재하지 않았던점을 보완하였습니다.
 
-- line 3 ~ 8: 버튼 Props에 대한 타입 정의
-- line 10 ~ 25: 함수형 컴포넌트 Button 생성 layout, size는 Default 값으로 'stroke', 'large'를 할당시킴. onClick은 null일 수도 있다는 타입 정의. text는 필수 값으로 타입 정의하여 버튼 컴포넌트의 재사용성을 높임
+### 마무리
 
-##### 인풋 컴포넌트
-
-![alt text](/public/image-5.png)
-
-- line 3 ~ 8: 인풋 Props에 대한 타입 정의
-- line 10 ~ 25: type, placeholder null일 수 있고, 기본값들 정의. value, onChange는 필수 값으로 정의 하여 인풋 컴포넌트의 재사용성을 높임.
-
-##### 로그인폼 컴포넌트
-
-![alt text](/public/image-6.png)
-
-- line 6 ~ 7: 인풋 상태관리를 위한 useState 훅을 사용
-- line 10 ~ 27: 이벤트 호출에 대한 핸들러 정의
-- line 29 ~ 52: Button, Input 컴포넌트를 불러와 사용 및 설계된 디자인에 맞게 Props를 전달
-
-##### 결과
-
-![alt text](/public/image-7.png)
-
-- 각 컴포넌트들을 조합하여 App.tsx에 렌더링한 결과입니다.
-
-##### 느낀점
-
-- 컴포넌트 분리를 함으로서 코드 가독성 및 유지 보수가 쉬워짐을 느꼈고 재사용성도 높아져 불필요한 코드 반복이 이루어지지 않는다는 것이 좋다는 것을 느꼈습니다.
-- 또한, 추후 각 컴포넌트에 대한 내부 로직들도 길어진다면 분리를 해야 한다는것을 알게 되었습니다. 관심사 분리가 중요.
+- 컴포넌트 테스트는 저번과 같이 Input 테스트만 시행하였습니다. 하지만 아직 테스트의 명확한 기준과 `vitest` 라이브러리 활용을 잘 못하고 있는거 같아 추가적인 공부가 더 필요할거 같습니다. 테스트 코드를 작성하는것은 처음이고 아직 감이 잘 잡히지 않는것 같습니다.

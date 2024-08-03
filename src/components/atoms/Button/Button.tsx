@@ -3,13 +3,15 @@ import './Button.css';
 
 type ButtonProps = {
   layout?: 'stroke' | 'fill';
+  type: 'button' | 'submit';
   size?: 'small' | 'medium' | 'large';
   text: string;
-  onClick?: (event: React.MouseEvent<HTMLButtonElement, MouseEvent>) => void;
+  onClick: (event: React.MouseEvent<HTMLButtonElement, MouseEvent>) => void;
 };
 
 const Button = ({
   layout = 'stroke',
+  type,
   size = 'large',
   text,
   onClick,
@@ -17,7 +19,7 @@ const Button = ({
   return (
     <button
       className={`button ${layout} ${size}`}
-      type='button'
+      type={type}
       onClick={onClick}
     >
       {text}
